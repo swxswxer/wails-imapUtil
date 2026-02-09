@@ -1,25 +1,111 @@
-# README
+# IMAP 邮件搜索工具
 
-## About
+## 项目介绍
 
-This is the official Wails Vue template.
+这是一个基于 Wails 和 Vue 开发的 IMAP 邮件搜索工具，用于快速搜索和管理邮件。
 
-You can configure the project by editing `wails.json`. More information about the project settings can be found
-here: https://wails.io/docs/reference/project-config
+### 主要功能
 
-## Live Development
+- ✅ IMAP 服务器连接管理
+- ✅ 邮件主题关键词搜索
+- ✅ 邮件主题清理（去除前缀）
+- ✅ 搜索结果导出为 Excel
+- ✅ 自动重连机制
+- ✅ 心跳检测，保持连接活跃
 
-To run in live development mode, run `wails dev` in the project directory. This will run a Vite development
-server that will provide very fast hot reload of your frontend changes. If you want to develop in a browser
-and have access to your Go methods, there is also a dev server that runs on http://localhost:34115. Connect
-to this in your browser, and you can call your Go code from devtools.
+## 技术栈
 
-## Building
+- **后端**: Go + Wails
+- **前端**: Vue 3 + Element Plus
+- **IMAP 库**: github.com/emersion/go-imap
 
-To build a redistributable, production mode package, use `wails build`.
+## 快速开始
+
+### 环境要求
+
+- Go 1.20+
+- Node.js 16+
+- Wails CLI 2.11.0+
+
+### 安装依赖
+
+```bash
+# 安装 Go 依赖
+go mod tidy
+
+# 安装前端依赖
+npm install
+```
+
+### 开发模式
+
+```bash
+# 启动开发服务器
+wails dev
+```
+
+开发服务器启动后，可以通过以下方式访问：
+- 桌面应用：自动打开
+- 浏览器：http://localhost:5174/
+- Wails DevServer：http://localhost:34115/
+
+### 构建应用
+
+```bash
+# 构建当前平台应用
+wails build
 
 # 构建 64 位 Windows 程序
 wails build --platform windows/amd64 --clean
+
+# 构建 macOS 应用
+wails build --platform darwin/amd64
+
+# 构建 Linux 应用
+wails build --platform linux/amd64
+```
+
+## 使用说明
+
+1. **登录界面**：输入 IMAP 服务器地址、端口、用户名和密码
+2. **搜索界面**：输入关键词搜索邮件主题
+3. **数据清理**：点击「数据清理」按钮去除邮件主题中的前缀
+4. **导出数据**：点击「导出为 Excel」按钮将搜索结果导出为 Excel 文件
+5. **断开连接**：点击「断开连接」按钮返回登录界面
+
+## 项目配置
+
+可以通过编辑 `wails.json` 文件配置项目设置，详细配置说明请参考：
+https://wails.io/docs/reference/project-config
+
+## 常见问题
+
+### 连接失败
+- 检查 IMAP 服务器地址和端口是否正确
+- 检查用户名和密码是否正确
+- 检查网络连接是否正常
+- 检查 IMAP 服务器是否允许远程连接
+
+### 搜索失败
+- 检查是否已连接到 IMAP 服务器
+- 检查网络连接是否正常
+- 系统会自动检测连接状态并尝试重新连接
+
+## 心跳机制
+
+系统内置了心跳机制，每 30 秒会自动发送一次 NOOP 命令到 IMAP 服务器，保持连接活跃，避免被服务器自动断开。
+
+## 自动重连
+
+当连接断开时，系统会自动尝试重新连接到 IMAP 服务器，确保搜索操作能够正常执行。
+
+## 许可证
+
+MIT License
+
+## 联系方式
+
+如有问题或建议，欢迎联系我们。
 
 
 
