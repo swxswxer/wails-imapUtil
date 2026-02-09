@@ -81,8 +81,14 @@ const connect = async () => {
     ElMessage.success('连接成功')
     router.push('/search')
   } catch (err) {
-    error.value = `连接失败: ${err.message}`
-    ElMessage.error(`连接失败: ${err.message}`)
+    // 统一的错误提示
+    const errorMessage = '请检查配置信息或网络连接'
+    
+    // 在控制台输出详细的错误信息
+    console.error('连接失败详情:', err)
+    
+    error.value = `连接失败: ${errorMessage}`
+    ElMessage.error(`连接失败: ${errorMessage}`)
   } finally {
     loading.value = false
   }

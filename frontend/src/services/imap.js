@@ -21,7 +21,12 @@ class ImapService {
       }
 
       // 调用后端连接方法
-      await App.IMAPConnect(config)
+      const result = await App.IMAPConnect(config)
+      
+      // 检查结果
+      if (!result) {
+        throw new Error('连接失败，请检查服务器地址和端口是否正确')
+      }
 
       this.config = config
       this.connected = true
@@ -33,6 +38,10 @@ class ImapService {
       return this
     } catch (error) {
       console.error('IMAP 连接失败:', error)
+      // 确保返回有意义的错误信息
+      if (!error || !error.message) {
+        throw new Error('连接失败，请检查网络连接或配置信息')
+      }
       throw error
     }
   }
@@ -63,10 +72,11 @@ class ImapService {
       console.log('IMAP 搜索结果:', messages)
       return messages
     } catch (error) {
+      // 在控制台输出详细的错误信息
       console.error('IMAP 搜索失败:', error)
       
       // 检查是否是连接断开错误
-      if (error.message.includes('连接已断开') || error.message.includes('未连接到 IMAP 服务器')) {
+      if (error && error.message && (error.message.includes('连接已断开') || error.message.includes('未连接到 IMAP 服务器'))) {
         this.connected = false
         
         // 尝试从 store 获取配置并重新连接
@@ -75,16 +85,24 @@ class ImapService {
         
         if (emailStore.config.host && emailStore.config.username && emailStore.config.password) {
           console.log('尝试重新连接 IMAP 服务器...')
-          await this.connect(emailStore.config)
-          
-          // 重新连接成功后再次执行搜索
-          const messages = await App.IMAPSearch(keyword)
-          console.log('重新连接后搜索结果:', messages)
-          return messages
+          try {
+            await this.connect(emailStore.config)
+            
+            // 重新连接成功后再次执行搜索
+            const messages = await App.IMAPSearch(keyword)
+            console.log('重新连接后搜索结果:', messages)
+            return messages
+          } catch (reconnectError) {
+            // 在控制台输出重新连接失败的详细信息
+            console.error('重新连接失败:', reconnectError)
+            // 抛出统一的错误信息
+            throw new Error('请检查配置信息或网络连接')
+          }
         }
       }
       
-      throw error
+      // 抛出统一的错误信息
+      throw new Error('请检查配置信息或网络连接')
     }
   }
 

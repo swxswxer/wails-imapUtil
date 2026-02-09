@@ -1,0 +1,35 @@
+{
+  "currentVersion": "1.01",
+  "versionInfo": {
+    "releaseDate": "2026-02-09",
+    "techStack": [
+      "后端: Go + Wails",
+      "前端: Vue 3 + Element Plus",
+      "IMAP 库: github.com/emersion/go-imap"
+    ],
+    "description": "这是一个基于 Wails 和 Vue 开发的 IMAP 邮件搜索工具，用于快速搜索和管理邮件。"
+  },
+  "changelog": [
+    {
+      "version": "1.01",
+      "date": "2026-02-09",
+      "changes": [
+        "增加心跳机制，每 30 秒会自动发送一次 NOOP 命令到 IMAP 服务器，保持连接活跃",
+        "每次查询前检查连接状态，如果已失效则尝试查询连接后再查询",
+        "增加详细的登录的失败提示",
+        "右下角增加设置按钮，点击后进入菜单，可以选择关于，查看工具版本信息，更新日志等（悬浮窗）"
+      ]
+    },
+    {
+      "version": "1.00",
+      "date": "2026-02-08",
+      "changes": [
+        "初始版本发布",
+        "支持 IMAP 服务器连接",
+        "支持邮件主题关键词搜索",
+        "支持邮件主题清理",
+        "支持搜索结果导出为 Excel"
+      ]
+    }
+  ]
+}
