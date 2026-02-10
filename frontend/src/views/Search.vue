@@ -5,7 +5,9 @@
         <div class="card-header">
           <span>邮件搜索</span>
           <div class="header-buttons">
-            <el-button type="success" @click="cleanData" :disabled="emails.length === 0">数据清理</el-button>
+            <el-tooltip content="可以去除邮件中的'回复'、'转发'、'RE'等关键字" placement="top">
+              <el-button type="success" @click="cleanData" :disabled="emails.length === 0">数据清理</el-button>
+            </el-tooltip>
             <el-button type="primary" @click="showExportDialog = true" :disabled="emails.length === 0">导出为 Excel</el-button>
           </div>
         </div>
@@ -255,6 +257,7 @@ onMounted(() => {
 }
 
 .search-card {
+   min-height: 95vh;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 

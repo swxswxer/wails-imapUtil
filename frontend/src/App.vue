@@ -1,12 +1,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { Setting } from '@element-plus/icons-vue'
+import { Setting, InfoFilled, Message, Calendar, Notebook, Check } from '@element-plus/icons-vue'
 import versionData from './version.json'
 
 // 对话框控制
-const showAbout = ref(false)
-const showVersion = ref(false)
-const showChangelog = ref(false)
+const showSettings = ref(false)
+
+// 菜单状态
+const activeMenu = ref('about')
 
 // 版本信息
 const versionInfo = ref({
@@ -18,6 +19,11 @@ const versionInfo = ref({
 
 // 更新日志
 const changelog = ref([])
+
+// 菜单选择处理
+const handleMenuSelect = (key) => {
+  activeMenu.value = key
+}
 
 // 初始化版本信息
 onMounted(() => {
@@ -37,65 +43,94 @@ onMounted(() => {
     
     <!-- 悬浮设置按钮 -->
     <div class="settings-float">
-      <el-dropdown trigger="click">
-        <el-button type="primary" circle>
-          <el-icon><Setting /></el-icon>
-        </el-button>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item @click="showAbout = true">关于</el-dropdown-item>
-            <el-dropdown-item @click="showVersion = true">版本信息</el-dropdown-item>
-            <el-dropdown-item @click="showChangelog = true">更新日志</el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
+      <el-button type="primary" circle @click="showSettings = true">
+        <el-icon><Setting /></el-icon>
+      </el-button>
     </div>
     
-    <!-- 关于对话框 -->
+    <!-- 设置窗口 -->
     <el-dialog
-      v-model="showAbout"
-      title="关于"
-      width="400px"
+      v-model="showSettings"
+      title="设置"
+      width="800px"
       destroy-on-close
     >
-      <div class="about-content">
-        <h3>IMAP 邮件搜索工具</h3>
-        <p class="version">版本：{{ versionInfo.currentVersion }}</p>
-        <p class="description">{{ versionInfo.description }}</p>
-        <p class="copyright">© 2026 Yeahka. All rights reserved.</p>
-      </div>
-    </el-dialog>
-    
-    <!-- 版本信息对话框 -->
-    <el-dialog
-      v-model="showVersion"
-      title="版本信息"
-      width="400px"
-      destroy-on-close
-    >
-      <div class="version-content">
-        <h3>版本：{{ versionInfo.currentVersion }}</h3>
-        <p><strong>发布日期：</strong>{{ versionInfo.releaseDate }}</p>
-        <p><strong>技术栈：</strong></p>
-        <ul>
-          <li v-for="(tech, index) in versionInfo.techStack" :key="index">{{ tech }}</li>
-        </ul>
-      </div>
-    </el-dialog>
-    
-    <!-- 更新日志对话框 -->
-    <el-dialog
-      v-model="showChangelog"
-      title="更新日志"
-      width="500px"
-      destroy-on-close
-    >
-      <div class="changelog-content">
-        <div v-for="(version, index) in changelog" :key="index">
-          <h3>版本 {{ version.version }} ({{ version.date }})</h3>
-          <ul>
-            <li v-for="(change, changeIndex) in version.changes" :key="changeIndex">{{ change }}</li>
-          </ul>
+      <div class="settings-container">
+        <!-- 左侧菜单 -->
+        <div class="settings-menu">
+          <el-menu
+            :default-active="activeMenu"
+            class="settings-menu"
+            @select="handleMenuSelect"
+          >
+            <el-menu-item index="about">
+              <el-icon><InfoFilled /></el-icon>
+              <span>关于</span>
+            </el-menu-item>
+          </el-menu>
+        </div>
+        
+        <!-- 右侧内容区 -->
+        <div class="settings-content">
+          <!-- 关于内容 -->
+          <div v-if="activeMenu === 'about'" class="about-content">
+            <!-- 头部信息 -->
+            <div class="about-header">
+              <div class="app-icon">
+                <el-icon class="icon-large"><Message /></el-icon>
+              </div>
+              <h2>IMAP 邮件搜索工具</h2>
+              <p class="version-tag">版本 {{ versionInfo.currentVersion }}</p>
+            </div>
+            
+            <!-- 描述信息 -->
+            <el-card class="about-card">
+              <template #header>
+                <div class="card-header">
+                  <el-icon><InfoFilled /></el-icon>
+                  <span>工具介绍</span>
+                </div>
+              </template>
+              <div class="card-content">
+                <p>{{ versionInfo.description }}</p>
+              </div>
+            </el-card>
+            
+
+            
+            <!-- 更新日志 -->
+            <el-card class="about-card">
+              <template #header>
+                <div class="card-header">
+                  <el-icon><Notebook /></el-icon>
+                  <span>更新日志</span>
+                </div>
+              </template>
+              <div class="card-content">
+                <div v-for="(version, index) in changelog" :key="index" class="version-item">
+                  <div class="version-header">
+                    <el-badge 
+                      :value="version.version" 
+                      type="primary" 
+                      class="version-badge"
+                    />
+                    <span class="version-date">{{ version.date }}</span>
+                  </div>
+                  <ul class="change-list">
+                    <li v-for="(change, changeIndex) in version.changes" :key="changeIndex">
+                      <el-icon class="change-icon"><Check /></el-icon>
+                      <span>{{ change }}</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </el-card>
+            
+            <!-- 版权信息 -->
+            <div class="copyright-section">
+              <p class="copyright">© 2026 Yeahka. All rights reserved.</p>
+            </div>
+          </div>
         </div>
       </div>
     </el-dialog>
@@ -132,76 +167,174 @@ body {
   height: 50px;
 }
 
-/* 关于对话框内容 */
+/* 设置窗口容器 */
+.settings-container {
+  display: flex;
+  height: 500px;
+}
+
+/* 左侧菜单 */
+.settings-menu {
+  width: 150px;
+  border-right: 1px solid #e4e7ed;
+}
+
+/* 右侧内容区 */
+.settings-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* 关于内容 */
 .about-content {
+  padding: 20px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* 头部信息 */
+.about-header {
   text-align: center;
-  padding: 20px 0;
+  margin-bottom: 30px;
+  padding: 30px 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.about-content h3 {
+.app-icon {
   margin-bottom: 20px;
-  color: #409eff;
 }
 
-.about-content .version {
-  font-size: 16px;
-  margin-bottom: 15px;
+.icon-large {
+  font-size: 64px;
+  opacity: 0.9;
+}
+
+.about-header h2 {
+  margin: 0 0 10px 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.version-tag {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* 卡片样式 */
+.about-card {
+  margin-bottom: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.about-card:hover {
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.12);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: #303133;
+}
+
+.card-content {
+  padding: 16px 0;
+}
+
+/* 信息项 */
+.info-item {
+  margin-bottom: 16px;
+}
+
+.info-label {
+  display: inline-block;
+  width: 100px;
+  font-weight: 500;
   color: #606266;
 }
 
-.about-content .description {
-  margin-bottom: 20px;
-  line-height: 1.6;
-  color: #606266;
+.info-value {
+  color: #303133;
 }
 
-.about-content .copyright {
+/* 技术栈标签 */
+.tech-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* 版本项 */
+.version-item {
+  margin-bottom: 24px;
+}
+
+.version-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.version-badge {
+  font-weight: 600;
+}
+
+.version-date {
+  color: #909399;
+  font-size: 14px;
+}
+
+/* 变更列表 */
+.change-list {
+  margin: 0;
+  padding-left: 24px;
+}
+
+.change-list li {
+  margin-bottom: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: #606266;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.change-list li span {
+  flex: 1;
+  text-align: left;
+}
+
+.change-icon {
+  margin-top: 2px;
+  color: #67c23a;
+  font-size: 14px;
+}
+
+/* 版权信息 */
+.copyright-section {
+  text-align: center;
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid #ebeef5;
+}
+
+.copyright {
   font-size: 14px;
   color: #909399;
-}
-
-/* 版本信息对话框内容 */
-.version-content {
-  padding: 10px 0;
-}
-
-.version-content h3 {
-  margin-bottom: 15px;
-  color: #409eff;
-}
-
-.version-content p {
-  margin-bottom: 10px;
-  color: #606266;
-}
-
-.version-content ul {
-  margin-left: 20px;
-  margin-bottom: 15px;
-}
-
-.version-content li {
-  margin-bottom: 5px;
-  color: #606266;
-}
-
-/* 更新日志对话框内容 */
-.changelog-content {
-  padding: 10px 0;
-}
-
-.changelog-content h3 {
-  margin: 20px 0 10px 0;
-  color: #409eff;
-}
-
-.changelog-content ul {
-  margin-left: 20px;
-  margin-bottom: 15px;
-}
-
-.changelog-content li {
-  margin-bottom: 5px;
-  color: #606266;
+  margin: 0;
 }
 </style>
